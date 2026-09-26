@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Callback - bKash Gateway</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .callback-card {
+      max-width: 520px;
+      margin: 80px auto;
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 36px 28px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .status-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-ambient"></div>
+
+  <div class="callback-card">
+    <div id="loader" class="status-icon-wrap icon-pink" style="background:#FDE8F1; color:#E2136E;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+      </svg>
+    </div>
+
+    <h2 id="callbackTitle" style="font-size:1.35rem; font-weight:800; margin-bottom:8px;">Verifying Payment with bKash...</h2>
+    <p id="callbackDesc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:24px;">Please wait while our Gateway server securely executes your payment transaction.</p>
+
+    <div id="resultBox" style="display:none; text-align:left; background:#F8FAFC; border:1px solid #E2E8F0; padding:18px; border-radius:12px; margin-bottom:24px; font-size:0.85rem;">
+      <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
+        <span style="color:var(--text-muted);">TrxID:</span>
+        <strong id="resTrxId" style="color:#065F46; font-family:monospace;">-</strong>
+      </div>
+      <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
+        <span style="color:var(--text-muted);">Amount:</span>
+        <strong id="resAmount">৳ 0.00</strong>
+      </div>
+      <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
+        <span style="color:var(--text-muted);">Payment ID:</span>
+        <span id="resPaymentId" style="font-family:monospace; font-size:0.75rem;">-</span>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--text-muted);">Customer:</span>
+        <span id="resCustomer">-</span>
+      </div>
+    </div>
+
+    <a href="index.html" class="btn btn-primary" style="width:100%;">Return to Gateway Dashboard</a>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentID = urlParams.get("paymentID");
+      const status = urlParams.get("status");
+
+      const title = document.getElementById("callbackTitle");
+      const desc = document.getElementById("callbackDesc");
+      const loader = document.getElementById("loader");
+      const resultBox = document.getElementById("resultBox");
+
+      if (status === "cancel" || status === "failure") {
+        loader.innerHTML = "❌";
+        loader.style.background = "#FEF2F2";
+        loader.style.color = "#EF4444";
+        title.textContent = status === "cancel" ? "Payment Cancelled" : "Payment Failed";
+        desc.textContent = "You cancelled or the bKash payment failed.";
+        return;
+      }
+
+      if (!paymentID) {
+        loader.innerHTML = "⚠️";
+        title.textContent = "Invalid Callback";
+        desc.textContent = "No paymentID parameter found in URL.";
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/gateway/execute-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentID: paymentID })
+        });
+
+        const data = await response.json();
+
+        if (data.statusCode === "0000") {
+          loader.innerHTML = "✓";
+          loader.style.background = "#ECFDF5";
+          loader.style.color = "#10B981";
+          loader.style.fontSize = "28px";
+          loader.style.fontWeight = "bold";
+
+          title.textContent = "Payment Successful!";
+          desc.textContent = "Your transaction has been confirmed and logged in your project ledger.";
+
+          document.getElementById("resTrxId").textContent = data.trxID;
+          document.getElementById("resAmount").textContent = `৳ ${data.amount} BDT`;
+          document.getElementById("resPaymentId").textContent = data.paymentID;
+          document.getElementById("resCustomer").textContent = data.customerMsisdn || "Verified";
+
+          resultBox.style.display = "block";
+        } else {
+          loader.innerHTML = "✕";
+          loader.style.background = "#FEF2F2";
+          loader.style.color = "#EF4444";
+          title.textContent = "Payment Execution Failed";
+          desc.textContent = data.statusMessage || "Error confirming payment with bKash.";
+        }
+      } catch (err) {
+        loader.innerHTML = "✕";
+        title.textContent = "Gateway Connection Error";
+        desc.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

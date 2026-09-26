@@ -1,0 +1,13 @@
+# Environment variables (NEVER COMMIT TO PUBLIC REPO)
+.env
+.env.local
+
+# Node dependencies
+node_modules/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
