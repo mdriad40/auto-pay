@@ -21,8 +21,8 @@ const BKASH_PASSWORD = process.env.BKASH_PASSWORD || "";
 const BKASH_APP_KEY = process.env.BKASH_APP_KEY || "";
 const BKASH_APP_SECRET = process.env.BKASH_APP_SECRET || "";
 
-const SUPABASE_HOST = "gruzpbfhhujmerwbdamo.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydXpwYmZoaHVqbWVyd2JkYW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MTQ5MDksImV4cCI6MjEwNTk5MDkwOX0.AFgJ-IKIVRx0_2wqCBvjPx_wNEGexD7kcFk69EL_sQM";
+const SUPABASE_HOST = process.env.SUPABASE_HOST || (process.env.SUPABASE_URL ? process.env.SUPABASE_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : "gruzpbfhhujmerwbdamo.supabase.co");
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "";
 
 // In-memory token cache for warm serverless instances
 let cachedIdToken = null;
