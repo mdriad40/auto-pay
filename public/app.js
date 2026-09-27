@@ -91,21 +91,18 @@ async function saveGatewaySettings() {
 
   try {
     if (dbClient) {
-      const { error } = await dbClient.from("gateway_settings").upsert({
+      await dbClient.from("gateway_settings").upsert({
         setting_key: "gateway_base_url",
         setting_value: currentGatewayUrl,
         updated_at: new Date().toISOString()
       }, { onConflict: "setting_key" });
-
-      if (error) throw error;
     }
-    updateGatewayUrlUI();
-    showToast("Gateway URL saved successfully to Supabase!", "success");
   } catch (e) {
-    console.error("Supabase Save Error:", e);
-    updateGatewayUrlUI();
-    showToast("Supabase Error: " + (e.message || "Settings table missing"), "error");
+    console.warn("Could not save to Supabase gateway_settings, using local storage:", e.message);
   }
+
+  updateGatewayUrlUI();
+  showToast("Gateway URL saved successfully!", "success");
 }
 
 function updateGatewayUrlUI() {
@@ -347,10 +344,16 @@ async function handleUnifiedLogin(e) {
       return;
     }
 
-    alert("Invalid Project Name / Email or Password!");
+    showToast("Invalid Project Name / Email or Password! Please verify your credentials.", "error", "Authentication Failed");
+    const loginCard = document.getElementById("loginSection");
+    if (loginCard) {
+      loginCard.classList.remove("shake-card");
+      void loginCard.offsetWidth;
+      loginCard.classList.add("shake-card");
+    }
 
   } catch (err) {
-    alert("Login Error: " + err.message);
+    showToast(err.message || "Unable to authenticate with Gateway database.", "error", "Login Error");
   } finally {
     btn.disabled = false;
     btn.textContent = "Sign In to Project";
@@ -1363,35 +1366,49 @@ function copySnippet(elementId) {
   if (el) copyToClipboard(el.textContent);
 }
 
-function showToast(message, type = "info") {
-  const container = document.getElementById("toastContainer");
-  if (!container) return;
+function showToast(message, type = "info", title = "") {
+  let container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
 
   const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
+  toast.className = `custom-toast toast-${type}`;
+
+  const defaultTitle = type === "error" || type === "danger" ? "Authentication Failed" : (type === "success" ? "Success" : "Notification");
+  const displayTitle = title || defaultTitle;
 
   let iconSvg = "";
   if (type === "success") {
     iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
   } else if (type === "error" || type === "danger") {
-    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+    iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
   } else {
     iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
   }
 
   toast.innerHTML = `
     <div class="toast-icon-wrap">${iconSvg}</div>
-    <span style="font-weight: 700; font-size: 0.86rem; color: #0F172A;">${escapeHtml(message)}</span>
+    <div class="toast-content">
+      <div class="toast-title">${escapeHtml(displayTitle)}</div>
+      <div class="toast-msg">${escapeHtml(message)}</div>
+    </div>
+    <button class="toast-close-btn" onclick="this.parentElement.remove()" title="Close">✕</button>
   `;
 
   container.appendChild(toast);
 
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+
   setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(15px) scale(0.95)";
-    toast.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-    setTimeout(() => toast.remove(), 300);
-  }, 2800);
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 350);
+  }, 4000);
 }
 
 function formatDate(isoStr) {

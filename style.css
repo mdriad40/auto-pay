@@ -1943,3 +1943,127 @@ html, body {
     gap: 10px;
   }
 }
+
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 420px;
+  width: calc(100% - 48px);
+}
+
+.custom-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.85);
+  transform: translateY(-20px) scale(0.96);
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-toast.show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.custom-toast.toast-error {
+  border-left: 4px solid #EF4444;
+  background: #FFFFFF;
+}
+
+.custom-toast.toast-success {
+  border-left: 4px solid #10B981;
+  background: #FFFFFF;
+}
+
+.custom-toast.toast-info {
+  border-left: 4px solid #0284C7;
+  background: #FFFFFF;
+}
+
+.toast-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-error .toast-icon-wrap {
+  background: #FEF2F2;
+  color: #EF4444;
+  border: 1px solid #FECACA;
+}
+
+.toast-success .toast-icon-wrap {
+  background: #ECFDF5;
+  color: #10B981;
+  border: 1px solid #A7F3D0;
+}
+
+.toast-info .toast-icon-wrap {
+  background: #EFF6FF;
+  color: #0284C7;
+  border: 1px solid #BFDBFE;
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 2px;
+}
+
+.toast-msg {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+.toast-close-btn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.toast-close-btn:hover {
+  color: #0F172A;
+  background: #F1F5F9;
+}
+
+@keyframes shakeLogin {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+
+.shake-card {
+  animation: shakeLogin 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
