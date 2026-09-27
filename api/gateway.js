@@ -13,16 +13,16 @@
 
 const https = require("https");
 
-// Environment configs with safe fallbacks
+// Environment configs strictly read from process.env
 const BKASH_IS_SANDBOX = process.env.BKASH_IS_SANDBOX === "true";
 const BKASH_HOST = BKASH_IS_SANDBOX ? "tokenized.sandbox.bka.sh" : "tokenized.pay.bka.sh";
-const BKASH_USERNAME = process.env.BKASH_USERNAME || "01309968240";
-const BKASH_PASSWORD = process.env.BKASH_PASSWORD || "+S]^9.2uWmZ";
-const BKASH_APP_KEY = process.env.BKASH_APP_KEY || "YsWRhZHyR7Lok4BIgcnS90qltc";
-const BKASH_APP_SECRET = process.env.BKASH_APP_SECRET || "LDwjL650aW66Pjg1Ip3Yx5om1Hdplfnfq713Dfi8PZ30pssX62wd";
+const BKASH_USERNAME = process.env.BKASH_USERNAME || "";
+const BKASH_PASSWORD = process.env.BKASH_PASSWORD || "";
+const BKASH_APP_KEY = process.env.BKASH_APP_KEY || "";
+const BKASH_APP_SECRET = process.env.BKASH_APP_SECRET || "";
 
-const SUPABASE_HOST = process.env.SUPABASE_HOST || (process.env.SUPABASE_URL ? process.env.SUPABASE_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : "gruzpbfhhujmerwbdamo.supabase.co");
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydXpwYmZoaHVqbWVyd2JkYW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MTQ5MDksImV4cCI6MjEwNTk5MDkwOX0.AFgJ-IKIVRx0_2wqCBvjPx_wNEGexD7kcFk69EL_sQM";
+const SUPABASE_HOST = process.env.SUPABASE_HOST || (process.env.SUPABASE_URL ? process.env.SUPABASE_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '') : "");
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "";
 
 // In-memory token cache for warm serverless instances
 let cachedIdToken = null;
