@@ -508,11 +508,15 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`🚀 bKash Custom Payment Gateway Running on Port ${PORT}`);
-  console.log(`🔗 Dashboard: http://localhost:${PORT}`);
-  console.log(`💳 bKash Mode: ${config.bkash.isSandbox ? "SANDBOX" : "LIVE"}`);
-  console.log(`📦 Supabase Connected: ${SUPABASE_HOST}`);
-  console.log(`=======================================================`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`🚀 bKash Custom Payment Gateway Running on Port ${PORT}`);
+    console.log(`🔗 Dashboard: http://localhost:${PORT}`);
+    console.log(`💳 bKash Mode: ${config.bkash.isSandbox ? "SANDBOX" : "LIVE"}`);
+    console.log(`📦 Supabase Connected: ${SUPABASE_HOST}`);
+    console.log(`=======================================================`);
+  });
+}
+
+module.exports = server;
