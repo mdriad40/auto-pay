@@ -344,16 +344,9 @@ async function handleUnifiedLogin(e) {
       return;
     }
 
-    showToast("Invalid Project Name / Email or Password! Please verify your credentials.", "error", "Authentication Failed");
-    const loginCard = document.getElementById("loginSection");
-    if (loginCard) {
-      loginCard.classList.remove("shake-card");
-      void loginCard.offsetWidth;
-      loginCard.classList.add("shake-card");
-    }
-
+    openAuthErrorModal("Authentication Failed", "Invalid Email or Password! Please verify your credentials.");
   } catch (err) {
-    showToast(err.message || "Unable to authenticate with Gateway database.", "error", "Login Error");
+    openAuthErrorModal("Login Error", err.message || "Unable to authenticate with Gateway database.");
   } finally {
     btn.disabled = false;
     btn.textContent = "Sign In to Project";
@@ -1503,6 +1496,30 @@ function closeClientProfileModal() {
   if (modal) modal.classList.remove("active");
 }
 
+function openAuthErrorModal(title = "Authentication Failed", message = "Invalid Email or Password! Please verify your credentials.") {
+  const modal = document.getElementById("authErrorModal");
+  const titleEl = document.getElementById("authErrorTitle");
+  const descEl = document.getElementById("authErrorDesc");
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = message;
+  if (modal) modal.classList.add("active");
+  const loginCard = document.getElementById("loginSection");
+  if (loginCard) {
+    loginCard.classList.remove("shake-card");
+    void loginCard.offsetWidth;
+    loginCard.classList.add("shake-card");
+  }
+}
+
+function closeAuthErrorModal() {
+  const modal = document.getElementById("authErrorModal");
+  if (modal) modal.classList.remove("active");
+  const pwdInput = document.getElementById("loginPassword");
+  if (pwdInput) pwdInput.focus();
+}
+
+window.openAuthErrorModal = openAuthErrorModal;
+window.closeAuthErrorModal = closeAuthErrorModal;
 window.toggleLicenseKeyVisibility = toggleLicenseKeyVisibility;
 window.openClientProfileModal = openClientProfileModal;
 window.closeClientProfileModal = closeClientProfileModal;
@@ -1536,3 +1553,4 @@ window.copyProjectKey = copyProjectKey;
 window.copyGatewayBaseUrl = copyGatewayBaseUrl;
 window.saveGatewaySettings = saveGatewaySettings;
 window.switchCodeTab = switchCodeTab;
+
