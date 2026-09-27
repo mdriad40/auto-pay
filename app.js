@@ -8,8 +8,14 @@
  * ============================================================================
  */
 
-const supabaseUrl = GATEWAY_CONFIG.supabase.url;
-const supabaseAnonKey = GATEWAY_CONFIG.supabase.anonKey;
+const _cfg = typeof GATEWAY_CONFIG !== "undefined"
+  ? GATEWAY_CONFIG
+  : (typeof window !== "undefined" && window.GATEWAY_CONFIG
+    ? window.GATEWAY_CONFIG
+    : (typeof require !== "undefined" ? require("./config") : { supabase: { url: "https://gruzpbfhhujmerwbdamo.supabase.co", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydXpwYmZoaHVqbWVyd2JkYW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MTQ5MDksImV4cCI6MjEwNTk5MDkwOX0.AFgJ-IKIVRx0_2wqCBvjPx_wNEGexD7kcFk69EL_sQM" } }));
+
+const supabaseUrl = _cfg.supabase.url;
+const supabaseAnonKey = _cfg.supabase.anonKey;
 const dbClient = (typeof window !== "undefined" && window.supabase) ? window.supabase.createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const SUPER_ADMIN_EMAIL = "mdriad.eee@gmail.com";
@@ -19,11 +25,13 @@ let currentUser = null; // { role: 'admin' | 'client', data: object }
 let allProjects = [];
 let allTransactions = [];
 
-document.addEventListener("DOMContentLoaded", () => {
-  checkSession();
-  initGlobalTooltip();
-  initDocCallbackHighlighting();
-});
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    checkSession();
+    initGlobalTooltip();
+    initDocCallbackHighlighting();
+  });
+}
 
 /**
  * Check Stored Session
@@ -733,12 +741,14 @@ function updateProjectFilterDropdown(projects) {
 }
 
 // Global outside click handler for custom dropdown
-document.addEventListener("click", (e) => {
-  const dd = document.getElementById("projectCustomDropdown");
-  if (dd && !dd.contains(e.target)) {
-    dd.classList.remove("is-open");
-  }
-});
+if (typeof document !== "undefined") {
+  document.addEventListener("click", (e) => {
+    const dd = document.getElementById("projectCustomDropdown");
+    if (dd && !dd.contains(e.target)) {
+      dd.classList.remove("is-open");
+    }
+  });
+}
 
 async function handleCreateProject(e) {
   e.preventDefault();
@@ -1518,39 +1528,41 @@ function closeAuthErrorModal() {
   if (pwdInput) pwdInput.focus();
 }
 
-window.openAuthErrorModal = openAuthErrorModal;
-window.closeAuthErrorModal = closeAuthErrorModal;
-window.toggleLicenseKeyVisibility = toggleLicenseKeyVisibility;
-window.openClientProfileModal = openClientProfileModal;
-window.closeClientProfileModal = closeClientProfileModal;
-window.switchClientTab = switchClientTab;
-window.switchClientCodeTab = switchClientCodeTab;
-window.handleClientTransactionSearch = handleClientTransactionSearch;
-window.handleUnifiedLogin = handleUnifiedLogin;
-window.handleLogout = handleLogout;
-window.switchAdminTab = switchAdminTab;
-window.openNewProjectModal = openNewProjectModal;
-window.closeNewProjectModal = closeNewProjectModal;
-window.openEditProjectModal = openEditProjectModal;
-window.closeEditProjectModal = closeEditProjectModal;
-window.handleUpdateProject = handleUpdateProject;
-window.handleCreateProject = handleCreateProject;
-window.toggleProjectStatus = toggleProjectStatus;
-window.filterAdminTransactions = filterAdminTransactions;
-window.handleAdminOverviewSearch = handleAdminOverviewSearch;
-window.handleAdminProjectSearch = handleAdminProjectSearch;
-window.handleRefreshOverview = handleRefreshOverview;
-window.handleRefreshTransactions = handleRefreshTransactions;
-window.handleRefreshClient = handleRefreshClient;
-window.toggleProjectDropdown = toggleProjectDropdown;
-window.selectProjectFilter = selectProjectFilter;
-window.loadAdminDashboardData = () => { loadServerStats(); loadAdminProjects(); loadAdminTransactions(); };
-window.loadAdminTransactions = loadAdminTransactions;
-window.loadClientTransactions = loadClientTransactions;
-window.copyToClipboard = copyToClipboard;
-window.copySnippet = copySnippet;
-window.copyProjectKey = copyProjectKey;
-window.copyGatewayBaseUrl = copyGatewayBaseUrl;
-window.saveGatewaySettings = saveGatewaySettings;
-window.switchCodeTab = switchCodeTab;
+if (typeof window !== "undefined") {
+  window.openAuthErrorModal = openAuthErrorModal;
+  window.closeAuthErrorModal = closeAuthErrorModal;
+  window.toggleLicenseKeyVisibility = toggleLicenseKeyVisibility;
+  window.openClientProfileModal = openClientProfileModal;
+  window.closeClientProfileModal = closeClientProfileModal;
+  window.switchClientTab = switchClientTab;
+  window.switchClientCodeTab = switchClientCodeTab;
+  window.handleClientTransactionSearch = handleClientTransactionSearch;
+  window.handleUnifiedLogin = handleUnifiedLogin;
+  window.handleLogout = handleLogout;
+  window.switchAdminTab = switchAdminTab;
+  window.openNewProjectModal = openNewProjectModal;
+  window.closeNewProjectModal = closeNewProjectModal;
+  window.openEditProjectModal = openEditProjectModal;
+  window.closeEditProjectModal = closeEditProjectModal;
+  window.handleUpdateProject = handleUpdateProject;
+  window.handleCreateProject = handleCreateProject;
+  window.toggleProjectStatus = toggleProjectStatus;
+  window.filterAdminTransactions = filterAdminTransactions;
+  window.handleAdminOverviewSearch = handleAdminOverviewSearch;
+  window.handleAdminProjectSearch = handleAdminProjectSearch;
+  window.handleRefreshOverview = handleRefreshOverview;
+  window.handleRefreshTransactions = handleRefreshTransactions;
+  window.handleRefreshClient = handleRefreshClient;
+  window.toggleProjectDropdown = toggleProjectDropdown;
+  window.selectProjectFilter = selectProjectFilter;
+  window.loadAdminDashboardData = () => { loadServerStats(); loadAdminProjects(); loadAdminTransactions(); };
+  window.loadAdminTransactions = loadAdminTransactions;
+  window.loadClientTransactions = loadClientTransactions;
+  window.copyToClipboard = copyToClipboard;
+  window.copySnippet = copySnippet;
+  window.copyProjectKey = copyProjectKey;
+  window.copyGatewayBaseUrl = copyGatewayBaseUrl;
+  window.saveGatewaySettings = saveGatewaySettings;
+  window.switchCodeTab = switchCodeTab;
+}
 
