@@ -215,14 +215,28 @@ module.exports = async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = parsedUrl.pathname;
 
-  let body = req.body || {};
-  if (typeof body === "string" && body.trim()) {
+  let body = req.body;
+  if (!body && (req.method === "POST" || req.method === "PUT" || req.method === "PATCH")) {
+    body = await new Promise((resolve) => {
+      let chunks = "";
+      req.on("data", (chunk) => (chunks += chunk));
+      req.on("end", () => {
+        try {
+          resolve(chunks ? JSON.parse(chunks) : {});
+        } catch (e) {
+          resolve({});
+        }
+      });
+      req.on("error", () => resolve({}));
+    });
+  } else if (typeof body === "string" && body.trim()) {
     try {
       body = JSON.parse(body);
     } catch (e) {
       body = {};
     }
   }
+  body = body || {};
 
   // Helper JSON responder
   const sendJson = (statusCode, data) => {
