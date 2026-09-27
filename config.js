@@ -29,7 +29,7 @@ if (typeof process !== "undefined" && typeof require !== "undefined") {
         }
       });
     }
-  } catch (e) {}
+  } catch (e) { }
 }
 
 const isServer = typeof process !== "undefined" && process.env;

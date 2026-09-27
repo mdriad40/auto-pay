@@ -130,68 +130,106 @@ async function getBkashToken() {
     tokenExpiresAt = now + expiresIn;
     return cachedIdToken;
   } else {
-    throw new Error(res.data.statusMessage || "Failed to obtain bKash id_token");
+    console.error("[bKash Token Error Details]: HTTP Status", res.status, "| Response:", JSON.stringify(res.data));
+    const msg = (res.data && (res.data.statusMessage || res.data.errorMessage || res.data.message)) || `HTTP ${res.status}: Failed to obtain bKash id_token`;
+    throw new Error(msg);
   }
 }
 
+// In-memory project verification cache for blazing fast performance
+const projectCache = new Map();
+const PROJECT_CACHE_TTL = 3 * 60 * 1000; // 3 minutes
+
 /**
- * Verify Project Authentication & Origin/Website
+ * Verify Project Authentication & Strict Origin/Domain Matching
+ * Only requires 'License-Key' — project_name, status, and domain are auto-resolved
  */
 async function verifyProjectAuth(req, requestBody) {
-  // Extract credentials from headers or body
-  const apiKey = req.headers["api-key"] || requestBody.api_key;
-  const licenseKey = req.headers["license-key"] || requestBody.license_key;
-  const projectName = req.headers["project-name"] || requestBody.project_name;
+  // Extract License Key from headers or request body
+  let licenseKey = req.headers["license-key"] ||
+    req.headers["license_key"] ||
+    req.headers["api-key"] ||
+    requestBody.license_key ||
+    requestBody.licenseKey ||
+    requestBody.api_key;
 
-  if (!apiKey || !licenseKey) {
+  // Check Authorization Bearer header
+  const authHeader = req.headers["authorization"] || "";
+  if (!licenseKey && authHeader.startsWith("Bearer ")) {
+    licenseKey = authHeader.slice(7).trim();
+  }
+
+  if (!licenseKey || typeof licenseKey !== "string" || !licenseKey.trim()) {
     return {
       isValid: false,
-      error: "Missing API Key or License Key in request headers/body (api-key, license-key)"
+      error: "Authentication Failed: Missing 'License-Key'. Please pass your project License Key in 'License-Key' header or request body."
     };
   }
 
-  // Query Supabase for matching project
-  let query = `gateway_projects?api_key=eq.${encodeURIComponent(apiKey)}&license_key=eq.${encodeURIComponent(licenseKey)}&select=*`;
-  if (projectName) {
-    query += `&project_name=eq.${encodeURIComponent(projectName)}`;
+  licenseKey = licenseKey.trim();
+
+  // 1. Check in-memory cache for instant lookup
+  let project = null;
+  const now = Date.now();
+  const cached = projectCache.get(licenseKey);
+
+  if (cached && cached.expiresAt > now) {
+    project = cached.project;
+  } else {
+    // 2. Query Supabase
+    let query = `gateway_projects?license_key=eq.${encodeURIComponent(licenseKey)}&select=*`;
+    let result = await supabaseRest(query);
+
+    // Fallback search by api_key if old key format used
+    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+      const fallbackQuery = `gateway_projects?api_key=eq.${encodeURIComponent(licenseKey)}&select=*`;
+      result = await supabaseRest(fallbackQuery);
+    }
+
+    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+      return {
+        isValid: false,
+        error: "Invalid License Key: No registered project matches this key in gateway registry."
+      };
+    }
+
+    project = result.data[0];
+    projectCache.set(licenseKey, { project, expiresAt: now + PROJECT_CACHE_TTL });
   }
 
-  const result = await supabaseRest(query);
-  if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
-    return {
-      isValid: false,
-      error: "Invalid API credentials or Project does not exist in registry."
-    };
-  }
-
-  const project = result.data[0];
-
+  // 3. Check project active status
   if (project.is_active === false) {
     return {
       isValid: false,
-      error: `Project '${project.project_name}' has been deactivated by administrator.`
+      error: `Project '${project.project_name}' is currently deactivated by administrator.`
     };
   }
 
-  // Origin/Website URL Validation
-  const reqOrigin = req.headers["origin"] || req.headers["referer"] || "";
+  // 4. Strict Domain / Origin Verification
+  // Ensures key only works on the exact registered website domain (subdomains blocked unless exact match)
+  const reqOrigin = req.headers["origin"] || req.headers["referer"] || requestBody.origin || "";
   const registeredUrl = (project.website_url || "").trim().toLowerCase();
 
   if (registeredUrl && registeredUrl !== "*" && registeredUrl !== "localhost") {
     try {
-      const regDomain = new URL(registeredUrl.startsWith("http") ? registeredUrl : "https://" + registeredUrl).hostname;
+      let regClean = registeredUrl.replace(/^https?:\/\//i, "").split("/")[0].split(":")[0];
       if (reqOrigin) {
-        const originDomain = new URL(reqOrigin).hostname;
-        // Allow exact domain or subdomains or localhost during testing
-        if (originDomain !== "localhost" && originDomain !== "127.0.0.1" && originDomain !== regDomain && !originDomain.endsWith("." + regDomain)) {
+        let originClean = reqOrigin.replace(/^https?:\/\//i, "").split("/")[0].split(":")[0];
+
+        // Allow localhost / 127.0.0.1 for development testing
+        const isLocal = originClean === "localhost" || originClean === "127.0.0.1";
+        const isRegLocal = regClean === "localhost" || regClean === "127.0.0.1";
+
+        if (!isLocal && !isRegLocal && originClean !== regClean) {
+          console.warn(`[Security Warning]: License Key used on unauthorized domain '${originClean}' (Registered: '${regClean}')`);
           return {
             isValid: false,
-            error: `Website URL mismatch: Request came from '${originDomain}', but project is licensed for '${regDomain}'`
+            error: "Unauthorized Domain: This License Key is not authorized for requests originating from this website domain."
           };
         }
       }
     } catch (e) {
-      // If URL parsing fails, continue or log
+      console.warn("[Domain Validation Warning]:", e.message);
     }
   }
 

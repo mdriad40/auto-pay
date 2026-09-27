@@ -80,7 +80,7 @@
   <!-- ========================================================================= -->
   <!-- 2. ADMIN DASHBOARD VIEW (Shown if logged in as mdriad.eee@gmail.com)     -->
   <!-- ========================================================================= -->
-  <div id="adminDashboardView" style="display:none; flex-direction:column; min-height:100vh;">
+  <div id="adminDashboardView" style="display:none; flex-direction:column;">
     <!-- Top Clean App Header -->
     <header class="app-header">
       <div class="brand-wrapper">
@@ -89,19 +89,14 @@
         <div>
           <div class="brand-title-line">
             <h1 class="brand-title">bKash Custom Gateway</h1>
-            <span class="portal-badge">Super Admin</span>
           </div>
-          <p class="brand-subtitle">Multi-Project Split API Manager & Proxy Hub</p>
+          <p class="brand-subtitle">Payment Checkout API Gateway</p>
         </div>
       </div>
 
       <div class="header-actions">
-        <div class="badge-live" id="masterStatusBadge">
-          <span class="badge-dot"></span>
-          <span id="masterStatusText">Master PGW Connected</span>
-        </div>
         <button class="btn btn-primary btn-sm" onclick="openNewProjectModal()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
@@ -111,17 +106,9 @@
           <div class="user-avatar-circle">R</div>
           <div class="user-meta-info">
             <span class="user-meta-name">Riad</span>
-            <span class="user-meta-role">Super Admin</span>
+            <span class="user-meta-role">Admin</span>
           </div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="handleLogout()" title="Logout">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          Sign Out
-        </button>
       </div>
     </header>
 
@@ -145,10 +132,22 @@
           </button>
         </div>
 
-        <div class="sidebar-wallet-card">
-          <span class="sidebar-wallet-label">Master Account Wallet</span>
-          <span class="sidebar-wallet-val">Active Proxy</span>
-          <span style="font-size:0.7rem; color:var(--text-muted); margin-top:3px; display:block;">Secure Tokenized Engine</span>
+        <div class="sidebar-footer-wrap">
+          <div class="sidebar-wallet-card">
+            <span class="sidebar-wallet-label">Security</span>
+            <span class="sidebar-wallet-val">End-to-End Encrypted</span>
+            <span style="font-size:0.72rem; color:var(--text-muted); margin-top:2px; display:block;">Secure Tokenized
+              Checkout</span>
+          </div>
+
+          <button class="sidebar-signout-btn" onclick="handleLogout()" title="Sign Out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </button>
         </div>
       </aside>
 
@@ -156,11 +155,11 @@
       <main class="dashboard-content-main">
         <!-- Tab: Overview -->
         <div id="tabOverview" class="tab-content active">
-          <!-- Admin Metrics Cards (4 in 1 Row) -->
+          <!-- Admin Metrics Cards -->
           <div class="metrics-grid">
             <div class="metric-card">
               <div class="metric-info">
-                <h4>Total Settled Volume</h4>
+                <h4>Total Settled Revenue</h4>
                 <div class="metric-value" id="statTotalVolume">৳ 0.00</div>
                 <div class="metric-footer">Across all registered projects</div>
               </div>
@@ -168,9 +167,9 @@
 
             <div class="metric-card">
               <div class="metric-info">
-                <h4>Today's Volume</h4>
+                <h4>Today's Revenue</h4>
                 <div class="metric-value" id="statTodayVolume">৳ 0.00</div>
-                <div class="metric-footer"><span>● Live</span> Processed since 00:00</div>
+                <div class="metric-footer">Processed today</div>
               </div>
             </div>
 
@@ -178,7 +177,15 @@
               <div class="metric-info">
                 <h4>Completed Payments</h4>
                 <div class="metric-value" id="statCompletedCount">0</div>
-                <div class="metric-footer"><span>✓ 100%</span> Executed transactions</div>
+                <div class="metric-footer">Transactions Completed</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <h4>Initiated & Pending</h4>
+                <div class="metric-value" id="statInitiatedCount">0</div>
+                <div class="metric-footer">Checkout Initiated or Cancelled</div>
               </div>
             </div>
 
@@ -193,8 +200,8 @@
           <div class="section-header">
             <div>
               <h2 class="section-title">Recent Transactions Across All Projects</h2>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Live feed of real-time transactions
-                captured through the Master bKash Merchant Gateway.</p>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Real-time overview of latest payment
+                settlements and incoming transactions.</p>
             </div>
             <div class="table-filter-bar">
               <div class="search-box-wrapper">
@@ -205,7 +212,14 @@
                 <input type="text" id="overviewSearchInput" class="form-input"
                   placeholder="Search TrxID, Project, Phone..." oninput="handleAdminOverviewSearch()">
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="loadAdminDashboardData()">Refresh</button>
+              <button class="btn btn-secondary btn-sm refresh-btn" onclick="handleRefreshOverview(this)"
+                title="Refresh Overview Data">
+                <svg class="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <span>Refresh</span>
+              </button>
             </div>
           </div>
           <div class="glass-panel">
@@ -214,7 +228,6 @@
                 <thead>
                   <tr>
                     <th>Date & Time</th>
-                    <th>Project (Reference)</th>
                     <th>TrxID / PaymentID</th>
                     <th>Customer Phone</th>
                     <th>Amount</th>
@@ -223,7 +236,7 @@
                 </thead>
                 <tbody id="overviewTransactionsTableBody">
                   <tr>
-                    <td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
+                    <td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
                       transactions...</td>
                   </tr>
                 </tbody>
@@ -234,13 +247,14 @@
 
         <!-- Tab: Projects -->
         <div id="tabProjects" class="tab-content" style="display:none;">
-          <div class="section-header">
+          <div class="section-header"
+            style="flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;">
             <div>
-              <h2 class="section-title">Registered Projects / Clients</h2>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Each project receives its unique API
-                Key & License Key with Origin restriction.</p>
+              <h2 class="section-title" style="margin:0;">Registered Projects</h2>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Manage merchant applications, access
+                licenses, and website domains.</p>
             </div>
-            <div class="table-filter-bar">
+            <div class="table-filter-bar" style="margin:0;">
               <div class="search-box-wrapper">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -265,8 +279,7 @@
                   <tr>
                     <th>Project Name</th>
                     <th>Contact Email</th>
-                    <th>Website URL (Origin)</th>
-                    <th>API Key</th>
+                    <th>Authorized Website</th>
                     <th>License Key</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -274,9 +287,8 @@
                 </thead>
                 <tbody id="projectsTableBody">
                   <tr>
-                    <td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
-                      projects...
-                    </td>
+                    <td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
+                      projects...</td>
                   </tr>
                 </tbody>
               </table>
@@ -290,8 +302,7 @@
             <div>
               <h2 class="section-title">Transaction Ledger & Split Reports</h2>
               <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Filter, audit, and inspect
-                individual
-                transactions across any project.</p>
+                individual transactions across any project.</p>
             </div>
             <div class="table-filter-bar">
               <div class="search-box-wrapper">
@@ -302,11 +313,34 @@
                 <input type="text" id="transactionsSearchInput" class="form-input"
                   placeholder="Search TrxID, Invoice, Phone..." oninput="filterAdminTransactions()">
               </div>
-              <select id="projectFilterSelect" class="form-input"
-                style="width: auto; padding: 7px 12px; font-size: 0.82rem;" onchange="filterAdminTransactions()">
-                <option value="ALL">All Projects</option>
-              </select>
-              <button class="btn btn-secondary btn-sm" onclick="loadAdminTransactions()">Refresh</button>
+              <div class="custom-dropdown" id="projectCustomDropdown">
+                <input type="hidden" id="projectFilterSelect" value="ALL">
+                <button type="button" class="custom-dropdown-btn" id="projectDropdownBtn"
+                  onclick="toggleProjectDropdown(event)">
+                  <span class="dropdown-selected-label" id="projectDropdownSelectedLabel">All Projects</span>
+                  <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="custom-dropdown-menu" id="projectDropdownMenu">
+                  <div class="dropdown-item active" onclick="selectProjectFilter('ALL', 'All Projects')">
+                    <span class="item-text">All Projects</span>
+                    <svg class="item-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm refresh-btn" onclick="handleRefreshTransactions(this)"
+                title="Refresh Transactions">
+                <svg class="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <span>Refresh</span>
+              </button>
             </div>
           </div>
           <div class="glass-panel">
@@ -340,150 +374,170 @@
           <div class="section-header">
             <div>
               <h2 class="section-title">Developer Integration Guide & API Reference</h2>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Complete REST API specification for integrating custom bKash payment checkout on websites and mobile apps.</p>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="portal-badge" style="background:#ECFDF5; color:#065F46; border-color:#A7F3D0;">REST API v1.0</span>
-              <span class="portal-badge" style="background:#E0F2FE; color:#0284C7; border-color:#BAE6FD;">JSON Payload</span>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Simple bKash payment gateway
+                integration for your websites and mobile apps.</p>
             </div>
           </div>
 
-          <!-- Section 1: Authentication & Headers -->
-          <div class="glass-panel" style="padding: 24px; margin-bottom: 24px;">
-            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">
-              1. Authentication & Security Headers
-            </h3>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px;">
-              Every API request requires client credentials passed as standard HTTP request headers. Both <code>Api-Key</code> and <code>License-Key</code> are generated upon registering a new project.
-            </p>
-
-            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden;">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th style="width: 200px;">Header Name</th>
-                    <th style="width: 120px;">Type</th>
-                    <th style="width: 120px;">Required</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>Api-Key</code></td>
-                    <td><span class="key-pill" style="font-size:0.75rem;">String</span></td>
-                    <td><span class="status-pill status-failed" style="font-size:0.7rem; padding:2px 8px;">Yes</span></td>
-                    <td style="color:var(--text-muted); font-size:0.82rem;">Your unique 32-character Project API identifier.</td>
-                  </tr>
-                  <tr>
-                    <td><code>License-Key</code></td>
-                    <td><span class="key-pill" style="font-size:0.75rem;">String</span></td>
-                    <td><span class="status-pill status-failed" style="font-size:0.7rem; padding:2px 8px;">Yes</span></td>
-                    <td style="color:var(--text-muted); font-size:0.82rem;">Secure secret license key assigned to your registered origin domain.</td>
-                  </tr>
-                  <tr>
-                    <td><code>Project-Name</code></td>
-                    <td><span class="key-pill" style="font-size:0.75rem;">String</span></td>
-                    <td><span class="status-pill status-initiated" style="font-size:0.7rem; padding:2px 8px;">Optional</span></td>
-                    <td style="color:var(--text-muted); font-size:0.82rem;">Your project reference name (recorded as reference in bKash statement).</td>
-                  </tr>
-                  <tr>
-                    <td><code>Content-Type</code></td>
-                    <td><span class="key-pill" style="font-size:0.75rem;">String</span></td>
-                    <td><span class="status-pill status-failed" style="font-size:0.7rem; padding:2px 8px;">Yes</span></td>
-                    <td style="color:var(--text-muted); font-size:0.82rem;">Must be set to <code>application/json</code>.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Section 2: Create Payment Endpoint -->
-          <div class="glass-panel" style="padding: 24px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">
-                2. Initiate Payment Checkout (Create Payment)
-              </h3>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-family: monospace; font-size: 0.76rem; background: #0F172A; color: #38BDF8; padding: 4px 10px; border-radius: 6px; font-weight: 700;">POST /api/gateway/create-payment</span>
+          <!-- Live Gateway Base URL Manager (Admin Configurable - Light Mode) -->
+          <div class="gateway-url-banner">
+            <div
+              style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div>
+                <div
+                  style="font-size: 0.74rem; text-transform: uppercase; color: #0284C7; font-weight: 800; letter-spacing: 0.06em;">
+                  Live Gateway Base URL
+                </div>
+                <div style="font-size: 0.84rem; color: var(--text-muted); margin-top: 2px;">
+                  Hosted domain endpoint for all client API integrations.
+                </div>
               </div>
             </div>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px;">
-              Sends a payment request to generate a secure bKash checkout URL. Redirect your customer to <code>bkashURL</code> to complete payment with OTP and PIN.
-            </p>
 
-            <div class="code-container" style="margin-bottom: 18px;">
-              <button class="code-copy-btn" onclick="copySnippet('codeCreate')">Copy JavaScript</button>
-              <pre id="codeCreate"><code>// JavaScript (Frontend / Backend) Integration Example:
-async function checkoutWithBkash() {
-  const response = await fetch("/api/gateway/create-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Api-Key": "YOUR_PROJECT_API_KEY",
-      "License-Key": "YOUR_PROJECT_LICENSE_KEY",
-      "Project-Name": "YOUR_PROJECT_NAME"
-    },
-    body: JSON.stringify({
-      amount: "500.00",
-      customerPhone: "017XXXXXXXX",
-      merchantInvoiceNumber: "INV-" + Date.now(),
-      callbackURL: window.location.origin + "/thankyou.html"
-    })
-  });
-
-  const data = await response.json();
-  if (data.bkashURL) {
-    // Redirect customer to the secure bKash payment gateway
-    window.location.href = data.bkashURL;
-  } else {
-    alert("Payment creation failed: " + (data.errorMessage || "Unknown error"));
-  }
-}</code></pre>
-            </div>
-
-            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Expected Response (JSON):</h4>
-            <div class="code-container">
-              <button class="code-copy-btn" onclick="copySnippet('codeCreateResponse')">Copy Response</button>
-              <pre id="codeCreateResponse"><code>{
-  "statusCode": "0000",
-  "statusMessage": "Successful",
-  "paymentID": "TR0011234567890",
-  "bkashURL": "https://tokenized.pay.bka.sh/checkout/payment/TR0011234567890",
-  "amount": "500.00",
-  "currency": "BDT",
-  "merchantInvoiceNumber": "INV-1711456789000"
-}</code></pre>
+            <div class="gateway-url-input-wrap">
+              <input type="text" id="inputGatewayBaseUrl" class="gateway-url-input"
+                placeholder="https://pay.yourdomain.com" />
+              <button class="btn btn-primary btn-sm" onclick="saveGatewaySettings()"
+                style="padding: 10px 18px; font-size: 0.84rem;">
+                Save URL
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="copyGatewayBaseUrl()" style="padding: 10px 14px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </button>
             </div>
           </div>
 
-          <!-- Section 3: Payment Verification / Execution Callback -->
-          <div class="glass-panel" style="padding: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">
-                3. Payment Execution & Callback Verification
-              </h3>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-family: monospace; font-size: 0.76rem; background: #0F172A; color: #10B981; padding: 4px 10px; border-radius: 6px; font-weight: 700;">Automatic Execution</span>
+          <!-- Vertical Stepper Timeline -->
+          <div class="stepper-timeline">
+            <!-- Step 1 -->
+            <div class="stepper-item">
+              <div class="stepper-track">
+                <div class="stepper-circle">1</div>
+                <div class="stepper-line"></div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Authentication &
+                        Credentials</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Required parameters for
+                        API requests.</p>
+                    </div>
+                    <span class="doc-step-num">Step 01</span>
+                  </div>
+
+                  <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 14px;">
+                    <div
+                      style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px 16px; border-radius: 10px;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #0284C7; text-transform: uppercase;">1.
+                        Gateway Base URL</div>
+                      <div style="font-size: 0.85rem; color: #1E293B; margin-top: 4px; font-weight: 600;">Live API
+                        endpoint for checkout.</div>
+                    </div>
+                    <div
+                      style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px 16px; border-radius: 10px;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #E2136E; text-transform: uppercase;">2.
+                        Project License Key</div>
+                      <div style="font-size: 0.85rem; color: #1E293B; margin-top: 4px; font-weight: 600;">Secret key for
+                        API authorization.</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px;">
-              Once the customer completes the transaction on bKash, the gateway executes the payment automatically and redirects back to your registered <code>callbackURL</code> with payment status parameters:
-            </p>
 
-            <div class="code-container">
-              <button class="code-copy-btn" onclick="copySnippet('codeCallback')">Copy Handler</button>
-              <pre id="codeCallback"><code>// Handling Callback on your thankyou.html page:
-const urlParams = new URLSearchParams(window.location.search);
-const paymentStatus = urlParams.get("status");       // "success" | "failure" | "cancel"
-const paymentID = urlParams.get("paymentID");
-const trxID = urlParams.get("trxID");
+            <!-- Step 2 -->
+            <div class="stepper-item">
+              <div class="stepper-track">
+                <div class="stepper-circle">2</div>
+                <div class="stepper-line"></div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Initiate Payment (Create
+                        Checkout)</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Send amount to generate
+                        secure bKash checkout URL.</p>
+                    </div>
+                    <span class="doc-step-num">Step 02</span>
+                  </div>
+
+                  <!-- Language Tabs -->
+                  <div class="code-tabs-nav" style="margin-top: 14px;">
+                    <button class="code-tab-btn active" id="tabBtn_js" onclick="switchCodeTab('js')">JavaScript
+                      (Fetch)</button>
+                    <button class="code-tab-btn" id="tabBtn_node" onclick="switchCodeTab('node')">Node.js
+                      (Axios)</button>
+                    <button class="code-tab-btn" id="tabBtn_php" onclick="switchCodeTab('php')">PHP (cURL)</button>
+                    <button class="code-tab-btn" id="tabBtn_python" onclick="switchCodeTab('python')">Python</button>
+                    <button class="code-tab-btn" id="tabBtn_curl" onclick="switchCodeTab('curl')">cURL (CLI)</button>
+                  </div>
+
+                  <!-- Code Snippet Area -->
+                  <div class="code-container tabbed">
+                    <button class="code-copy-btn" onclick="copySnippet('dynamicCodeSnippet')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Code
+                    </button>
+                    <pre id="dynamicCodeSnippet"><code>// Loading snippet...</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="stepper-item is-last">
+              <div class="stepper-track">
+                <div class="stepper-circle">3</div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Instant Callback & Order
+                        Confirmation</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Handle the customer
+                        redirect after OTP & PIN completion.</p>
+                    </div>
+                    <span class="doc-step-num">Step 03</span>
+                  </div>
+
+                  <div class="code-container" style="margin-top: 14px;">
+                    <button class="code-copy-btn" onclick="copySnippet('codeCallbackHandler')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Handler
+                    </button>
+                    <pre id="codeCallbackHandler"><code>// Put this code on your callbackURL / thankyou page:
+const params = new URLSearchParams(window.location.search);
+const paymentStatus = params.get("status");       // "success" | "failure" | "cancel"
+const paymentID = params.get("paymentID");         // bKash Payment ID
+const trxID = params.get("trxID");                 // e.g. BKASH_TRX_987654
 
 if (paymentStatus === "success") {
   console.log("Payment Confirmed! TrxID:", trxID, "PaymentID:", paymentID);
-  // Fulfill order for customer
+  // Fulfill order / update status in your database
 } else {
-  console.error("Payment was not completed. Status:", paymentStatus);
+  console.warn("Payment was cancelled or failed:", paymentStatus);
 }</code></pre>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -494,124 +548,388 @@ if (paymentStatus === "success") {
   <!-- ========================================================================= -->
   <!-- 3. MERCHANT / CLIENT DASHBOARD VIEW (Shown if logged in as client)       -->
   <!-- ========================================================================= -->
-  <div id="merchantDashboardView" style="display:none; flex-direction:column; min-height:100vh;">
+  <!-- ========================================================================= -->
+  <!-- 3. MERCHANT / CLIENT DASHBOARD VIEW (Shown if logged in as client)       -->
+  <!-- ========================================================================= -->
+  <div id="merchantDashboardView" style="display:none; flex-direction:column;">
     <header class="app-header">
       <div class="brand-wrapper">
         <img src="attachment/Bkash-Logo.png" alt="bKash Merchant" class="header-brand-logo">
         <div class="brand-divider"></div>
         <div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <h1 class="brand-title" id="merchantProjectTitle">Project Portal</h1>
-            <span class="portal-badge client">Client Portal</span>
+          <div class="brand-title-line">
+            <h1 class="brand-title">Client Area</h1>
           </div>
-          <p class="brand-subtitle" id="merchantProjectSub">bKash Custom Gateway</p>
+          <p class="brand-subtitle">Payment Checkout API Gateway</p>
         </div>
       </div>
 
       <div class="header-actions">
-        <div class="badge-live">
-          <span class="badge-dot"></span>
-          <span>Gateway Active</span>
+        <div class="admin-user-pill clickable-user-pill" onclick="openClientProfileModal()"
+          title="Click to view full merchant profile">
+          <div class="user-avatar-circle" id="clientAvatarCircle">M</div>
+          <div class="user-meta-info">
+            <span class="user-meta-name" id="clientMetaName">Merchant</span>
+            <span class="user-meta-role" id="clientMetaEmail"
+              style="color:var(--bkash-pink); font-weight:600;">client@email.com</span>
+          </div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="handleLogout()" title="Logout">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          Sign Out
-        </button>
       </div>
     </header>
 
-    <main class="main-container">
-      <div class="glass-panel" style="padding: 24px; margin-bottom: 24px;">
-        <h3 style="font-size:1.1rem; font-weight:800; margin-bottom: 16px;">🔑 Your Integration Credentials</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <div>
-            <label
-              style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Project
-              Reference Name</label>
-            <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-              <span class="key-pill" id="dispProjectName"
-                style="font-size:0.9rem; font-weight:700; color:var(--bkash-pink);">-</span>
+    <!-- 2-Column Body Layout (Side Menu + Main Content) -->
+    <div class="dashboard-body-layout">
+      <!-- SIDE MENU -->
+      <aside class="dashboard-sidebar">
+        <div class="side-menu-nav">
+          <span class="side-menu-heading">Main Navigation</span>
+          <button class="side-menu-link tab-btn active" id="tabClientOverviewBtn" onclick="switchClientTab('overview')">
+            Overview
+          </button>
+          <button class="side-menu-link tab-btn" id="tabClientKeysBtn" onclick="switchClientTab('keys')">
+            API Keys
+          </button>
+          <button class="side-menu-link tab-btn" id="tabClientDocsBtn" onclick="switchClientTab('docs')">
+            API Docs
+          </button>
+        </div>
+
+        <div class="sidebar-footer-wrap">
+          <div class="sidebar-wallet-card">
+            <span class="sidebar-wallet-label">Security</span>
+            <span class="sidebar-wallet-val">End-to-End Encrypted</span>
+            <span style="font-size:0.72rem; color:var(--text-muted); margin-top:2px; display:block;">Secure Tokenized
+              Checkout</span>
+          </div>
+
+          <button class="sidebar-signout-btn" onclick="handleLogout()" title="Sign Out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT AREA -->
+      <main class="dashboard-content-main">
+        <!-- Tab 1: Overview -->
+        <div id="tabClientOverview" class="tab-content active">
+          <!-- Metrics Grid -->
+          <div class="metrics-grid cols-4">
+            <div class="metric-card">
+              <div class="metric-info">
+                <h4>Total Settled Revenue</h4>
+                <div class="metric-value" id="projStatTotalVol">৳ 0.00</div>
+                <div class="metric-footer">Across your project lifetime</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <h4>Today's Revenue</h4>
+                <div class="metric-value" id="projStatTodayVol">৳ 0.00</div>
+                <div class="metric-footer">Processed today</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <h4>Completed Payments</h4>
+                <div class="metric-value" id="projStatOrders">0</div>
+                <div class="metric-footer">Transactions Completed</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <h4>Initiated & Pending</h4>
+                <div class="metric-value" id="projStatInitiated">0</div>
+                <div class="metric-footer">Checkout Initiated or Cancelled</div>
+              </div>
             </div>
           </div>
-          <div>
-            <label style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">API
-              Key</label>
-            <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-              <span class="key-pill" id="dispApiKey" style="flex:1;">-</span>
-              <button class="btn btn-secondary btn-sm" onclick="copyProjectKey('dispApiKey')">Copy</button>
+
+          <!-- Section Header with Search & Animated Refresh -->
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Your Payment Transactions</h2>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Real-time overview of payments
+                received through your store.</p>
+            </div>
+            <div class="table-filter-bar">
+              <div class="search-box-wrapper">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="clientTransactionsSearchInput" class="form-input"
+                  placeholder="Search TrxID, Invoice, Customer..." oninput="handleClientTransactionSearch()">
+              </div>
+              <button class="btn btn-secondary btn-sm refresh-btn" onclick="handleRefreshClient(this)"
+                title="Refresh Transactions">
+                <svg class="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <span>Refresh</span>
+              </button>
             </div>
           </div>
-          <div>
-            <label
-              style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">License
-              Key</label>
-            <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-              <span class="key-pill" id="dispLicenseKey" style="flex:1;">-</span>
-              <button class="btn btn-secondary btn-sm" onclick="copyProjectKey('dispLicenseKey')">Copy</button>
+
+          <div class="glass-panel">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Invoice No</th>
+                    <th>Trx ID</th>
+                    <th>Payment ID</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="merchantTransactionsBody">
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
+                      transactions...</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-info">
-            <h4>Total Project Revenue</h4>
-            <div class="metric-value" id="projStatTotalVol">৳ 0.00</div>
+        <!-- Tab 2: API Keys -->
+        <div id="tabClientKeys" class="tab-content" style="display:none;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Integration Credentials & Access Keys</h2>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Use these secret keys and authorized
+                endpoints to connect your website.</p>
+            </div>
           </div>
-          <div class="metric-icon icon-pink">৳</div>
-        </div>
 
-        <div class="metric-card">
-          <div class="metric-info">
-            <h4>Today's Revenue</h4>
-            <div class="metric-value" id="projStatTodayVol">৳ 0.00</div>
+          <div class="glass-panel" style="padding: 24px; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">Project
+                  Reference Name</label>
+                <div style="display:flex; align-items:center;">
+                  <span class="supabase-tag" id="dispProjectName"
+                    style="font-size:0.86rem; font-weight:700; color:var(--bkash-pink); background:#FDF2F7; border-color:#FCE7F3; padding:6px 12px;">-</span>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">Authorized
+                  Website Domain (Origin)</label>
+                <div style="display:flex; align-items:center;">
+                  <span class="supabase-tag" id="dispWebsiteUrl"
+                    style="font-size:0.84rem; color:#0F172A; font-family:monospace; padding:6px 12px;">-</span>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">Project
+                  License Key</label>
+                <div class="supabase-key-box"
+                  style="padding:4px 8px 4px 12px; display:inline-flex; align-items:center; gap:8px; width:auto;">
+                  <span class="supabase-key-text" id="dispLicenseKey"
+                    style="font-size:0.84rem; color:#0284C7; font-weight:700; letter-spacing:0.06em;">••••••••••••••••••••••••••••••••</span>
+                  <div style="display:inline-flex; align-items:center; gap:6px;">
+                    <button class="supabase-eye-btn" id="btnToggleKeyVisibility" onclick="toggleLicenseKeyVisibility()"
+                      title="Show License Key">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                    <button class="supabase-copy-btn" onclick="copyProjectKey('dispLicenseKey')"
+                      title="Copy License Key">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span>Copy</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">Live
+                  Gateway Base API URL</label>
+                <div class="supabase-key-box" style="padding:4px 8px 4px 12px; display:inline-flex; width:auto;">
+                  <span class="supabase-key-text" id="dispGatewayUrl" style="font-size:0.84rem; color:#0F172A;">-</span>
+                  <button class="supabase-copy-btn" onclick="copyProjectKey('dispGatewayUrl')" title="Copy Gateway URL">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="metric-icon icon-emerald">৳</div>
         </div>
 
-        <div class="metric-card">
-          <div class="metric-info">
-            <h4>Completed Orders</h4>
-            <div class="metric-value" id="projStatOrders">0</div>
+        <!-- Tab 3: API Docs -->
+        <div id="tabClientDocs" class="tab-content" style="display:none;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Developer Integration Guide & API Reference</h2>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Simple bKash payment gateway
+                integration for your website and mobile apps.</p>
+            </div>
           </div>
-          <div class="metric-icon icon-sky">📦</div>
-        </div>
-      </div>
 
-      <div class="section-header">
-        <h2 class="section-title">Your Payment Transactions</h2>
-        <button class="btn btn-secondary btn-sm" onclick="loadClientTransactions()">Refresh</button>
-      </div>
+          <!-- Stepper Timeline -->
+          <div class="stepper-timeline">
+            <!-- Step 1 -->
+            <div class="stepper-item">
+              <div class="stepper-track">
+                <div class="stepper-circle">1</div>
+                <div class="stepper-line"></div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Authentication &
+                        Credentials</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Required parameters for
+                        API requests.</p>
+                    </div>
+                    <span class="doc-step-num">Step 01</span>
+                  </div>
 
-      <div class="glass-panel">
-        <div class="table-responsive">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Date & Time</th>
-                <th>Invoice No</th>
-                <th>Trx ID</th>
-                <th>Payment ID</th>
-                <th>Customer</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="merchantTransactionsBody">
-              <tr>
-                <td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Loading
-                  transactions...</td>
-              </tr>
-            </tbody>
-          </table>
+                  <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 14px;">
+                    <div
+                      style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px 16px; border-radius: 10px;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #0284C7; text-transform: uppercase;">1.
+                        Gateway Base URL</div>
+                      <div style="font-size: 0.85rem; color: #1E293B; margin-top: 4px; font-weight: 600;">Live API
+                        endpoint for checkout.</div>
+                    </div>
+                    <div
+                      style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px 16px; border-radius: 10px;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #E2136E; text-transform: uppercase;">2.
+                        Project License Key</div>
+                      <div style="font-size: 0.85rem; color: #1E293B; margin-top: 4px; font-weight: 600;">Secret key for
+                        API authorization.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="stepper-item">
+              <div class="stepper-track">
+                <div class="stepper-circle">2</div>
+                <div class="stepper-line"></div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Initiate Payment (Create
+                        Checkout)</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Send amount to generate
+                        secure bKash checkout URL.</p>
+                    </div>
+                    <span class="doc-step-num">Step 02</span>
+                  </div>
+
+                  <!-- Language Tabs -->
+                  <div class="code-tabs-nav" style="margin-top: 14px;">
+                    <button class="code-tab-btn active" id="tabClientBtn_js"
+                      onclick="switchClientCodeTab('js')">JavaScript (Fetch)</button>
+                    <button class="code-tab-btn" id="tabClientBtn_node" onclick="switchClientCodeTab('node')">Node.js
+                      (Axios)</button>
+                    <button class="code-tab-btn" id="tabClientBtn_php" onclick="switchClientCodeTab('php')">PHP
+                      (cURL)</button>
+                    <button class="code-tab-btn" id="tabClientBtn_python"
+                      onclick="switchClientCodeTab('python')">Python</button>
+                    <button class="code-tab-btn" id="tabClientBtn_curl" onclick="switchClientCodeTab('curl')">cURL
+                      (CLI)</button>
+                  </div>
+
+                  <!-- Code Snippet Area -->
+                  <div class="code-container tabbed">
+                    <button class="code-copy-btn" onclick="copySnippet('dynamicClientCodeSnippet')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Code
+                    </button>
+                    <pre id="dynamicClientCodeSnippet"><code>// Loading snippet...</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="stepper-item is-last">
+              <div class="stepper-track">
+                <div class="stepper-circle">3</div>
+              </div>
+              <div class="stepper-content">
+                <div class="doc-card">
+                  <div class="doc-header-row">
+                    <div>
+                      <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main);">Instant Callback & Order
+                        Confirmation</h3>
+                      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Handle the customer
+                        redirect after OTP & PIN completion.</p>
+                    </div>
+                    <span class="doc-step-num">Step 03</span>
+                  </div>
+
+                  <div class="code-container" style="margin-top: 14px;">
+                    <button class="code-copy-btn" onclick="copySnippet('codeClientCallbackHandler')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Handler
+                    </button>
+                    <pre id="codeClientCallbackHandler"><code>// Put this code on your callbackURL / thankyou page:
+const params = new URLSearchParams(window.location.search);
+const paymentStatus = params.get("status");       // "success" | "failure" | "cancel"
+const paymentID = params.get("paymentID");         // bKash Payment ID
+const trxID = params.get("trxID");                 // e.g. BKASH_TRX_987654
+
+if (paymentStatus === "success") {
+  console.log("Payment Confirmed! TrxID:", trxID, "PaymentID:", paymentID);
+  // Fulfill order / update status in your database
+} else {
+  console.warn("Payment was cancelled or failed:", paymentStatus);
+}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <!-- ========================================================================= -->
@@ -621,15 +939,15 @@ if (paymentStatus === "success") {
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Create New Project / Merchant Client</h3>
-        <button class="btn btn-secondary btn-sm" onclick="closeNewProjectModal()"
-          style="border:none; padding:4px 8px;">✕</button>
+        <button class="modal-close-btn" onclick="closeNewProjectModal()" title="Close">✕</button>
       </div>
       <form id="newProjectForm" onsubmit="handleCreateProject(event)">
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Project Name (Must be Unique)</label>
             <input type="text" id="inputProjectName" class="form-input" placeholder="e.g. MyShopifyApp" required>
-            <p class="form-hint">This name will be automatically set as the reference for bKash transactions. Must be unique.</p>
+            <p class="form-hint">This name will be automatically set as the reference for bKash transactions. Must be
+              unique.</p>
           </div>
 
           <div class="form-group">
@@ -661,6 +979,139 @@ if (paymentStatus === "success") {
           <button type="submit" class="btn btn-primary" id="btnSubmitProject">Generate & Save Project</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EDIT PROJECT (ADMIN ONLY)                                          -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" id="editProjectModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Project Settings</h3>
+        <button class="modal-close-btn" onclick="closeEditProjectModal()" title="Close">✕</button>
+      </div>
+      <form id="editProjectForm" onsubmit="handleUpdateProject(event)">
+        <input type="hidden" id="editProjectId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Project Name</label>
+            <input type="text" id="editProjectName" class="form-input" required>
+            <p class="form-hint">Reference name used across gateway logs and portal login.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Client Contact Email</label>
+            <input type="email" id="editProjectEmail" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Client Portal Login Password</label>
+            <input type="text" id="editProjectPassword" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Owner Phone Number</label>
+            <input type="tel" id="editProjectPhone" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Allowed Website / Home URL (Strict Domain Origin)</label>
+            <input type="text" id="editProjectWebsiteUrl" class="form-input" required>
+            <p class="form-hint">Must match client frontend origin (e.g., https://mysite.com or http://localhost:5000).
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="editProjectStatus" class="form-input" style="height:42px;">
+              <option value="true">Active (Accept Payments)</option>
+              <option value="false">Disabled (Block Payments)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditProjectModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnUpdateProject">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CLIENT / MERCHANT PROFILE INFO (MINIMAL CLEAN VIEW)                -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" id="clientProfileModal">
+    <div class="modal-content"
+      style="max-width: 480px; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.12);">
+
+      <!-- Minimal Clean Header -->
+      <div class="modal-header" style="padding: 18px 22px; border-bottom: 1px solid #F1F5F9; background: #FFFFFF;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div id="profModalAvatar"
+            style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #E2136E, #FF3385); color:#FFFFFF; font-size:0.92rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            M</div>
+          <div>
+            <h3 id="profModalHeaderName"
+              style="font-size:1rem; font-weight:700; color:#0F172A; margin:0; line-height:1.2;">Merchant Profile</h3>
+            <span
+              style="display:inline-flex; align-items:center; gap:5px; font-size:0.74rem; color:#64748B; font-weight:600; margin-top:2px;">
+              Status: <span
+                style="display:inline-flex; align-items:center; gap:4px; color:#059669; font-weight:700;"><span
+                  style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                Active</span>
+            </span>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeClientProfileModal()" title="Close">✕</button>
+      </div>
+
+      <!-- Minimal Body (Key-Value Grid) -->
+      <div class="modal-body" style="padding: 20px 22px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px 14px; border-radius:10px;">
+              <span
+                style="font-size:0.68rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em; display:block;">Project
+                Name</span>
+              <div id="profModalProjectName" style="font-weight:600; font-size:0.88rem; color:#0F172A; margin-top:4px;">
+                -</div>
+            </div>
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px 14px; border-radius:10px;">
+              <span
+                style="font-size:0.68rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em; display:block;">Phone
+                Number</span>
+              <div id="profModalPhone" style="font-weight:600; font-size:0.88rem; color:#0F172A; margin-top:4px;">-
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px 14px; border-radius:10px;">
+            <span
+              style="font-size:0.68rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em; display:block;">Registered
+              Email</span>
+            <div id="profModalEmail"
+              style="font-weight:600; font-size:0.88rem; color:#0F172A; margin-top:4px; word-break:break-all;">-</div>
+          </div>
+
+          <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px 14px; border-radius:10px;">
+            <span
+              style="font-size:0.68rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em; display:block;">Website
+              Origin</span>
+            <div id="profModalWebsite"
+              style="font-weight:600; font-size:0.88rem; color:#334155; margin-top:4px; word-break:break-all;">-</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Minimal Footer -->
+      <div class="modal-footer"
+        style="padding: 14px 22px; border-top: 1px solid #F1F5F9; background: #FAFAFA; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeClientProfileModal()"
+          style="padding: 6px 16px; font-size: 0.82rem; font-weight:600;">Close</button>
+      </div>
     </div>
   </div>
 
